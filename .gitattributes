@@ -1,0 +1,31 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Force LF for source files (good for cross-platform consistency)
+*.ts     text eol=lf
+*.html   text eol=lf
+*.scss   text eol=lf
+*.css    text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+
+# Binary files (do not modify line endings)
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.svg    binary
+*.ico    binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.eot    binary
+*.mp4    binary
+*.mp3    binary
+*.zip    binary
+*.pdf    binary
+
+# Prevent Git from changing line endings in images and assets
+src/assets/** binary

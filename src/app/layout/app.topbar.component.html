@@ -1,0 +1,317 @@
+<div class="layout-topbar">
+  <p-toast></p-toast>
+  <a class="layout-topbar-logo" routerLink="">
+    <img style="height: 50px; width: 50px " src="assets/layout/images/{{layoutService.config.colorScheme === 'monoprix' ? 'monoprix' : 'monoprix'}}.png" alt="logo">
+    <span>MonoFosm</span>
+  </a>
+
+  <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button" (click)="layoutService.showProfileSidebar()">
+    <i class="pi pi-ellipsis-v"></i>
+  </button>
+
+  <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
+
+    <div *ngIf="userName" class="flex items-center space-x-2">
+      <!--<img
+        style="height: 50px; width: 50px; cursor: pointer"
+        src="assets/layout/images/Icon%20bot.png"
+        alt="logo"
+        (click)="showChatBotDialog()"
+      >-->
+
+      <button
+        *ngIf="role === 'Finance'"
+        pButton
+        pRipple
+        label="Financial Assistant"
+        class="p-button-rounded border-none font-light line-height-2 bg-red-500 text-white"
+        (click)="showChatBotDialog()"
+      ></button>
+
+      <button
+        *ngIf="role === 'Supplier Management'"
+        pButton
+        pRipple
+        label="Supplier Recommendation"
+        class="p-button-rounded border-none font-light line-height-2 bg-red-500 text-white"
+        (click)="showChatBotDialog()"
+      ></button>
+
+
+      <button
+        *ngIf="role === 'Sales'"
+        pButton
+        pRipple
+        label="Product Pairs Recommendation"
+        class="p-button-rounded border-none font-light line-height-2 bg-red-500 text-white"
+        (click)="showChatBotDialog()"
+      ></button>
+
+      <button
+        *ngIf="role === 'tests'"
+        pButton
+        pRipple
+        label="Store Layout Generator"
+        class="p-button-rounded border-none font-light line-height-2 bg-green-500 text-white"
+        (click)="openStoreLayoutDialog()"
+      ></button>
+
+    </div>
+
+
+
+    <p-menubar [model]="tieredItems" [style]="{'border': 'none'}">
+      <ng-template pTemplate="end">
+      </ng-template>
+    </p-menubar>
+  </div>
+
+  <p-dialog header="My Profile" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <span><strong>My Name : </strong></span>   <span>{{userName}}</span>
+    <br><br>
+    <span><strong>My Email : </strong></span>      <span>{{email}}</span>
+    <br><br>
+    <span><strong>My Role : </strong></span>       <span [class]="'customer-badge status-' + getRoleClass(role)">{{role}}</span>
+  </p-dialog>
+
+  <p-dialog header="ChatBot" [(visible)]="chatbotdialog" [style]="{ width: '50rem' }">
+    <div class="formgroup-inline" style="margin-top: 10px;">
+      <div class="p-float-label">
+        <p-dropdown id="selectedOption" [autoDisplayFirst]="true" [options]="choseOptions" [(ngModel)]="selectedOption"></p-dropdown>
+        <label for="selectedOption">Option</label>
+      </div>
+      <div class="p-float-label">
+        <p-dropdown id="selectedstock" [autoDisplayFirst]="false" [options]="stockOptions" [(ngModel)]="selectedstock"></p-dropdown>
+        <label for="selectedstock">Stock</label>
+      </div>
+
+      <div class="card">
+        <p-scrollPanel [style]="{width: '100%', height: '300px'}">
+          <p-chip label="ChatBot : Hi, My purpose is to assist users by providing information, answering questions, and helping with tasks to the best of my ability. I strive to make interactions efficient, enjoyable, and educational for everyone who interacts with me." styleClass="m-1"></p-chip>
+          <p-table [value]="chatbotReponces"   responsiveLayout="scroll">
+            <ng-template pTemplate="body" let-reponse >
+              <p-chip label="You: {{reponse.question}}" styleClass="m-1"></p-chip>
+              <br>
+              <p-chip label="ChatBot: {{reponse.response}}" styleClass="m-1"></p-chip>
+              <br>
+            </ng-template>
+          </p-table>
+          <p-scrollTop target="parent" styleClass="custom-scrolltop" [threshold]="100" icon="pi pi-arrow-up"></p-scrollTop>
+        </p-scrollPanel>
+      </div>
+      <div class="field">
+        <textarea rows="2.5" cols="75" [(ngModel)]="question" placeholder="Ask anything" pInputTextarea></textarea>
+      </div>
+      <button pButton [disabled]="loading"  (click)="submitChat()">{{ loading ? 'Loading...' : 'Submit' }}</button>
+    </div>
+  </p-dialog>
+
+  <p-dialog header="Supplier Recommendation" [(visible)]="SupplierRecommendationdialog" [style]="{ width: '50rem' }">
+    <div class="formgroup-inline" style="margin-top: 10px;">
+      <div class="p-float-label">
+        <p-dropdown id="selectedCategory" [autoDisplayFirst]="true" [options]="CategoryOptions" [(ngModel)]="selectedCategory"></p-dropdown>
+        <label for="selectedCategory">Category</label>
+      </div>
+
+      <div class="card" style="width: 95%; min-height: 125px">
+        <ng-container *ngIf="supplierRecommendations.length > 0; else noData">
+          <p-table [value]="supplierRecommendations" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Supplier Name</th>
+                <th>Country</th>
+                <th>Average Price</th>
+                <th>Disputes</th>
+                <th># Transactions</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-supplier>
+              <tr>
+                <td>{{ supplier.SupplierName }}</td>
+                <td>{{ supplier.Country }}</td>
+                <td>{{ supplier.AvgSupplierPrice }}</td>
+                <td>{{ supplier.HasDisputes }}</td>
+                <td>{{ supplier.NumberOfTransactions }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ng-container>
+
+        <!-- Message when no data -->
+        <ng-template #noData>
+          <p-chip
+            label="Not enough data available for this category. Please try another one."
+            styleClass="m-2 bg-red-100 text-red-700 font-semibold">
+          </p-chip>
+        </ng-template>
+      </div>
+
+      <button pButton [disabled]="loadingSupplier"  (click)="submitSupplierRecommendation()">{{ loadingSupplier ? 'Loading...' : 'Submit' }}</button>
+    </div>
+  </p-dialog>
+
+  <p-dialog header="Product Pairs Recommendation" [(visible)]="SalesRecommendationdialog" [style]="{ width: '50rem' }">
+    <div class="formgroup-inline" style="margin-top: 10px;">
+      <div class="p-float-label">
+        <input pInputText id="pairsnumber" type="number" [(ngModel)]="pairsnumber" />
+        <label for="pairsnumber">Number of Pairs</label>
+      </div>
+
+      <div class="card" style="width: 95%; min-height: 125px">
+        <ng-container *ngIf="SalesRecommendations.length > 0; else noDataforsales">
+          <p-table [value]="SalesRecommendations" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Product 1</th>
+                <th>Product 2</th>
+                <th>Score</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-pair>
+              <tr>
+                <td>{{ pair.product1_name }}</td>
+                <td>{{ pair.product2_name }}</td>
+                <td>{{ pair.score * 100 | number:'1.2-2' }}%</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ng-container>
+
+        <!-- Message when no data -->
+        <ng-template #noDataforsales>
+          <p-chip
+            label="Not enough data available."
+            styleClass="m-2 bg-red-100 text-red-700 font-semibold">
+          </p-chip>
+        </ng-template>
+      </div>
+
+      <button pButton [disabled]="loadingSales" (click)="submitSalesRecommendation()">
+        {{ loadingSales ? 'Loading...' : 'Submit' }}
+      </button>
+    </div>
+  </p-dialog>
+
+  <p-dialog header="Store Layout Generator" [(visible)]="StoreLayoutDialog" [style]="{ width: '80%' }">
+    <div class="formgroup-inline" style="margin-bottom: 1rem; padding-top: 1rem; ">
+      <div class="p-float-label" >
+        <p-dropdown
+          [options]="[
+          { label: 'Rectangle', value: 'rectangle' },
+          { label: 'L-shape', value: 'L-shape' },
+          { label: 'Custom', value: 'custom' }
+        ]"
+          [(ngModel)]="layoutShape"
+          id="layoutShape">
+        </p-dropdown>
+        <label for="layoutShape">Shape</label>
+      </div>
+
+      <div class="p-float-label">
+        <input type="number" pInputText [(ngModel)]="layoutWidth" />
+        <label>Width</label>
+      </div>
+      <div class="p-float-label">
+        <input type="number" pInputText [(ngModel)]="layoutHeight" />
+        <label>Height</label>
+      </div>
+      <div class="field-checkbox">
+        <p-checkbox name="butcher" [(ngModel)]="includeButcher" binary="true" id="butcher"></p-checkbox>
+        <label for="butcher">Include Butcher</label>
+      </div>
+      <div class="field-checkbox">
+        <p-checkbox name="fruits" [(ngModel)]="includeFruitsVegetables" binary="true" id="fruits"></p-checkbox>
+        <label for="fruits">Fruits & Vegetables</label>
+      </div>
+      <div class="field-checkbox">
+        <p-checkbox name="spices" [(ngModel)]="includeSpices" binary="true" id="spices" ></p-checkbox>
+        <label for="spices">Spices</label>
+      </div>
+      <div class="field-checkbox">
+        <p-checkbox name="staff" [(ngModel)]="includeStaffRoom" binary="true" id="staff"></p-checkbox>
+        <label for="staff">Staff Room</label>
+      </div>
+
+
+      <button pButton (click)="generateLayout()" [disabled]="loadingLayout">
+        {{ loadingLayout ? 'Generating...' : 'Generate Layout' }}
+      </button>
+    </div>
+
+    <div class="p-field p-grid">
+      <label class="p-col-fixed" style="width: 120px">Select Cell Type:</label>
+      <p-dropdown
+        [options]="cellTypes"
+        [(ngModel)]="selectedCellType"
+        optionLabel="label"
+        placeholder="Select a type">
+      </p-dropdown>
+    </div>
+
+    <div *ngIf="storeLayout.length > 0">
+      <h5>Layout Preview</h5>
+      <div
+        [ngStyle]="{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(' + layoutWidth + ', 50px)',
+      gap: '4px'
+    }"
+      >
+        <ng-container *ngFor="let row of storeLayout; let rowIndex = index; trackBy: trackByIndex">
+          <ng-container *ngFor="let cell of row; let colIndex = index; trackBy: trackByIndex">
+            <div
+              (click)="onCellClick(rowIndex, colIndex)"
+              [ngStyle]="{
+        width: '50px',
+        height: '50px',
+        backgroundColor: getCellColor(cell),
+        border: '1px solid #ccc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '12px',
+        cursor: 'pointer'
+      }"
+            >
+              {{ getCellEmogie(cell) }}
+            </div>
+          </ng-container>
+        </ng-container>
+
+
+      </div>
+      <br />
+      <button pButton (click)="arrangeProducts()" [disabled]="loadingArrangement">
+        {{ loadingArrangement ? 'Arranging...' : 'Arrange Products' }}
+      </button>
+    </div>
+
+
+
+
+    <div *ngIf="arrangedProducts.length > 0" style="margin-top: 1rem;">
+      <h5>Product Arrangement</h5>
+      <p-table [value]="arrangedProducts" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Product 1</th>
+            <th>Product 2</th>
+            <th>Score</th>
+            <th>Position 1</th>
+            <th>Position 2</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-p>
+          <tr>
+            <td>{{ p.product1 }}</td>
+            <td>{{ p.product2 }}</td>
+            <td>{{ (p.score * 100) | number:'1.2-2' }}%</td>
+            <td>{{ p.product1_position.join(', ') }}</td>
+            <td>{{ p.product2_position.join(', ') }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-dialog>
+
+</div>
