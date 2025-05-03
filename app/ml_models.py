@@ -13,16 +13,19 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import MinMaxScaler
 from prophet import Prophet
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # --- Step 1: Database connection ---
 def get_db_connection():
-    server = 'localhost'
-    database = 'DW_Monoprix'
-    driver = '{ODBC Driver 17 for SQL Server}'
-
-    connection_string = f'DRIVER={driver};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
-    conn = pyodbc.connect(connection_string)
+    conn = pyodbc.connect(
+        f"DRIVER={{{os.getenv('SQL_DRIVER')}}};"
+        f"SERVER={os.getenv('SQL_SERVER')};"
+        f"DATABASE={os.getenv('SQL_DATABASE')};"
+        "Trusted_Connection=yes;"
+    )
     return conn
 
 

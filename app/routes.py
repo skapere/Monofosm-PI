@@ -11,6 +11,10 @@ from app.layout_optimizer import generate_store_layout, arrange_products
 import jwt
 import datetime
 from flask import current_app as app
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 api_blueprint = Blueprint('api', __name__)
 
@@ -52,11 +56,11 @@ def login():
 # Database connection
 def get_db_connection():
     conn = pyodbc.connect(
-        'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=.;'
-        'DATABASE=DW_Monoprix;'
-        'UID=sa1;'
-        'PWD=1234'
+        f"DRIVER={{{os.getenv('SQL_DRIVER')}}};"
+        f"SERVER={os.getenv('SQL_SERVER')};"
+        f"DATABASE={os.getenv('SQL_DATABASE')};"
+        f"UID={os.getenv('SQL_USERNAME')};"
+        f"PWD={os.getenv('SQL_PASSWORD')}"
     )
     return conn
 
