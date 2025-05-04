@@ -1,0 +1,2 @@
+-- Mesure : MAX_highset_price_reached
+MAX(Fact_FinancialAndAccountingManagement[Bource_HighestPrice])

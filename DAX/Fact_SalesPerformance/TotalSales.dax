@@ -1,0 +1,2 @@
+-- Mesure : TotalSales
+CALCULATE(SUM(Fact_SalesPerformance[SalesTransactions_Amount]), USERELATIONSHIP(DimDate[PK_Date], Fact_SalesPerformance[StTransactionDateID]))

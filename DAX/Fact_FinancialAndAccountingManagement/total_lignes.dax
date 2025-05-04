@@ -1,0 +1,2 @@
+-- Mesure : total_lignes
+COUNTROWS(Fact_FinancialAndAccountingManagement)

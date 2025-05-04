@@ -1,0 +1,8 @@
+-- Mesure : Revenu_Date
+
+
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AF_Revenu_Cleaned]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+)

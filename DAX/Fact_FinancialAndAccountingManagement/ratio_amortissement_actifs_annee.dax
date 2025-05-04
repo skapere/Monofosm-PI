@@ -1,0 +1,33 @@
+-- Mesure : ratio_amortissement_actifs_annee
+
+VAR SelectedAnnualFinancesID = SELECTEDVALUE(DimAnnualFinances[PK_AnnualFinances])
+VAR AmortissementCumule = 
+    IF (
+        ISBLANK(SelectedAnnualFinancesID),
+        BLANK(),
+        CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Amortissement_Cumule]),
+            Fact_FinancialAndAccountingManagement[AnnualFinancesID] = SelectedAnnualFinancesID
+        )
+    )
+VAR ValeurActifs = 
+    IF (
+        ISBLANK(SelectedAnnualFinancesID),
+        BLANK(),
+        CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Valeur_des_Actifs]),
+            Fact_FinancialAndAccountingManagement[AnnualFinancesID] = SelectedAnnualFinancesID
+        )
+    )
+VAR Ratio = 
+    IF (
+        ISBLANK(ValeurActifs),
+        BLANK(),
+        (AmortissementCumule / ValeurActifs) * 100
+    )
+RETURN
+    IF (
+        ISBLANK(SelectedAnnualFinancesID),
+        "Please select an annual code",
+        FORMAT(Ratio, "0.0##") & " %"
+    )

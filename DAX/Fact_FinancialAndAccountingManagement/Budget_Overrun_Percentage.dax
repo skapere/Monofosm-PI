@@ -1,0 +1,16 @@
+-- Mesure : Budget_Overrun_Percentage
+
+CALCULATE(
+    (
+        SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_ActualExpenses]) 
+        - SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_Budget])
+    ) 
+    / 
+    SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_Budget]) 
+    * 100,
+    USERELATIONSHIP(
+        DimDate[PK_Date], 
+        Fact_FinancialAndAccountingManagement[FsStatementDateID]
+    )
+)
+

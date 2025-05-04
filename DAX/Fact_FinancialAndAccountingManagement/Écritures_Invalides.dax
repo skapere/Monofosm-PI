@@ -1,0 +1,9 @@
+-- Mesure : Écritures_Invalides
+
+CALCULATE(
+    COUNTROWS(Fact_FinancialAndAccountingManagement),
+    FILTER(
+        DimAccountingJournal,
+        DimAccountingJournal[IsValid] = FALSE()
+    )
+)

@@ -1,0 +1,7 @@
+-- Mesure : TauxConformite
+
+DIVIDE(
+    CALCULATE(COUNTROWS(Fact_SupplierManagement), Fact_SupplierManagement[DisputeID] = BLANK()),
+    COUNTROWS(Fact_SupplierManagement)
+) 
+

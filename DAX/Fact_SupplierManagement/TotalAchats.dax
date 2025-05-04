@@ -1,0 +1,5 @@
+-- Mesure : TotalAchats
+
+CALCULATE(
+SUM(Fact_SupplierManagement[PurchaseOrder_TotalAmount]) , USERELATIONSHIP(DimDate[PK_Date],Fact_SupplierManagement[PoDateID]))
+

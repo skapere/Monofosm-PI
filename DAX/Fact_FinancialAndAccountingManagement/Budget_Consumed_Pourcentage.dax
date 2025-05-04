@@ -1,0 +1,13 @@
+-- Mesure : Budget_Consumed_Pourcentage
+
+VAR ratio = CALCULATE(
+    (SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_ActualExpenses]) 
+    /
+    SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_Budget])) * 100,
+    USERELATIONSHIP(
+        DimDate[PK_Date], 
+        Fact_FinancialAndAccountingManagement[FsStatementDateID]
+    )
+)
+RETURN 
+    FORMAT(ratio, "0.0") & " %"

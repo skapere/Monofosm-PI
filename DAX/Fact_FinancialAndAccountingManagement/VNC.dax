@@ -1,0 +1,2 @@
+-- Mesure : VNC
+sum(Fact_FinancialAndAccountingManagement[AF_Valeur_des_Actifs])-sum(Fact_FinancialAndAccountingManagement[AF_Amortissement_Cumule])

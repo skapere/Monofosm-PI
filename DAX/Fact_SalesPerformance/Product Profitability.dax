@@ -1,0 +1,2 @@
+-- Mesure : Product Profitability
+SUM(Fact_SalesPerformance[SalesTransactions_Amount]) - SUM(Fact_SalesPerformance[Product_SupplierPrice])

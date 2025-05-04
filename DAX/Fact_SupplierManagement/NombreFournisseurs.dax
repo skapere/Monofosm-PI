@@ -1,0 +1,32 @@
+-- Mesure : NombreFournisseurs
+
+/*CALCULATE(
+    COUNTROWS(Fact_SupplierManagement),
+    NOT(ISBLANK(Fact_SupplierManagement[SupplierID]))
+)*/
+
+/*CALCULATE(
+    COUNTROWS(
+        DISTINCT(
+            FILTER(
+                Fact_SupplierManagement,
+                NOT(ISBLANK(Fact_SupplierManagement[SupplierID]))
+            )
+        )
+    )
+)*/  
+
+
+CALCULATE(
+    DISTINCTCOUNT(Fact_SupplierManagement[SupplierID]),
+    NOT(ISBLANK(Fact_SupplierManagement[SupplierID])),
+    TREATAS(
+        VALUES(DimSupplier[PK_Supplier]),
+        Fact_SupplierManagement[SupplierID]
+    )
+)
+
+
+
+
+

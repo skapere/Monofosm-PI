@@ -1,0 +1,24 @@
+-- Mesure : Maintenance Cost to Asset Investment Ratio
+
+
+VAR Maintenance = 
+    
+        CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Cout_de_Maintenance]),
+            USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+        )
+    
+VAR Investment = 
+          CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Investissement_dans_les_Actifs]),
+            USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+        )
+//VAR Ratio = 
+RETURN
+    IF (
+        ISBLANK(Investment),
+        BLANK(),
+        (Maintenance / Investment)
+    )
+//RETURN
+        //FORMAT(Ratio, "0.0##") & " %"

@@ -1,0 +1,38 @@
+-- Mesure : KPI_Resolution_Status_Icon
+
+VAR SelectedDisputeCode = SELECTEDVALUE(Fact_SupplierManagement[code_dispute])
+VAR SelectedDateID = SELECTEDVALUE(DimDate[PK_Date])
+
+VAR AverageDays =
+    AVERAGEX(
+        FILTER(
+            Fact_SupplierManagement,
+            NOT ISBLANK(Fact_SupplierManagement[DisputeDateID]) &&
+            NOT ISBLANK(Fact_SupplierManagement[ResolutionDateID])
+        ),
+        DATEDIFF(
+            LOOKUPVALUE(DimDate[Full Date], DimDate[PK_Date], Fact_SupplierManagement[DisputeDateID]),
+            LOOKUPVALUE(DimDate[Full Date], DimDate[PK_Date], Fact_SupplierManagement[ResolutionDateID]),
+            DAY
+        )
+    )
+
+VAR FormattedAverage = FORMAT(AverageDays, "0") & " jrs"
+
+RETURN
+    SWITCH(
+        TRUE(),
+       // ISBLANK(AverageDays), "Aucune donnée",
+       // ISBLANK(SelectedDisputeCode) || ISBLANK(SelectedDateID), 
+          //  FormattedAverage,
+
+        AverageDays < 15,
+            UNICHAR(128994) & " " & FormattedAverage,  -- 🟢 Très bon
+
+        AverageDays <= 25,
+            UNICHAR(128992) & " " & FormattedAverage,  -- 🟡 Moyen
+
+        AverageDays > 25,
+            UNICHAR(128308) & " " & FormattedAverage   -- 🔴 Mauvais
+    )
+

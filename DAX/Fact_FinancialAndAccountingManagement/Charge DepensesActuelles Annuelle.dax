@@ -1,0 +1,17 @@
+-- Mesure : Charge DepensesActuelles Annuelle
+
+VAR DepensesActuellesAnneeX =
+    CALCULATE(
+        SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_ActualExpenses]),
+        USERELATIONSHIP('Fact_FinancialAndAccountingManagement'[FsStatementDateID], 'DimDate'[PK_Date])
+    )
+
+VAR DepensesActuellesPrecedente =
+    CALCULATE(
+        SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_ActualExpenses]),
+        USERELATIONSHIP('Fact_FinancialAndAccountingManagement'[FsStatementDateID], 'DimDate'[PK_Date]),
+        DATEADD('DimDate'[Full Date], -1, YEAR)
+    )
+
+RETURN
+    DepensesActuellesAnneeX - DepensesActuellesPrecedente

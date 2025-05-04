@@ -1,0 +1,7 @@
+-- Mesure : Evaluated Profitability
+
+IF(
+    [Product Profitability] > 0, 
+    "Rentable", 
+    "Non Rentable"
+)

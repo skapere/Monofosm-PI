@@ -1,0 +1,19 @@
+-- Mesure : %ProduitsSatisfaits
+
+CALCULATE(
+    DIVIDE(
+        SUMX(
+            Fact_SalesPerformance,
+            SWITCH(
+                TRUE(),
+                Fact_SalesPerformance[Product_AverageRating] >= 4, 1,
+                Fact_SalesPerformance[Product_AverageRating] >= 2 && Fact_SalesPerformance[Product_AverageRating] < 4, 0.5,
+                Fact_SalesPerformance[Product_AverageRating] < 2, 0.1,
+                0
+            )
+        ),
+        COUNTROWS(Fact_SalesPerformance)
+    ) * 100,
+    USERELATIONSHIP(DimDate[PK_Date], Fact_SalesPerformance[StTransactionDateID])
+)
+

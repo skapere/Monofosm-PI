@@ -1,0 +1,20 @@
+-- Mesure : Asset_TurnoOver_Ratio
+
+VAR ValeurActifsAnneeX =
+   
+        CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AF_Valeur_des_Actifs]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+        )
+VAR RevenuAnneeX =
+      CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AF_Revenu]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+)
+RETURN
+    IF (
+        ISBLANK(ValeurActifsAnneeX) || ISBLANK(RevenuAnneeX),
+        BLANK(),
+        (RevenuAnneeX / ValeurActifsAnneeX) 
+    )
+

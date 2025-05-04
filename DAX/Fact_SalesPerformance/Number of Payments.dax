@@ -1,0 +1,2 @@
+-- Mesure : Number of Payments
+COUNT(DimSalesTransactions[PK_SalesTransactions])

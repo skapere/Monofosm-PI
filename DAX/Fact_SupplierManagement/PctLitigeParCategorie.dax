@@ -1,0 +1,7 @@
+-- Mesure : PctLitigeParCategorie
+
+DIVIDE(
+    CALCULATE(COUNTROWS(Fact_SupplierManagement)),
+    CALCULATE(COUNTROWS(Fact_SupplierManagement), ALL(DimCategory))
+) 
+

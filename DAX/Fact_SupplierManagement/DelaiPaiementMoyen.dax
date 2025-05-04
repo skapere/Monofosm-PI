@@ -1,0 +1,17 @@
+-- Mesure : DelaiPaiementMoyen
+
+AVERAGEX(
+    Fact_SupplierManagement,
+    DATEDIFF(
+        CALCULATE(
+            MAX(DimDate[PK_Date]),
+            USERELATIONSHIP(DimDate[PK_Date], Fact_SupplierManagement[InvoiceDueDateID])
+        ),
+        CALCULATE(
+            MAX(DimDate[PK_Date]),
+            USERELATIONSHIP(DimDate[PK_Date], Fact_SupplierManagement[InvoicePaymentDueDateID])
+        ),
+        DAY
+    )
+)
+

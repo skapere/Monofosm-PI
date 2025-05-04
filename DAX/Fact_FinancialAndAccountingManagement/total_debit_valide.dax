@@ -1,0 +1,13 @@
+-- Mesure : total_debit_valide
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AJ_DebitAmount]),
+    FILTER(
+        DimAccountingJournal,
+        DimAccountingJournal[isValid] = TRUE()
+    ),
+    USERELATIONSHIP(
+        DimDate[PK_Date], 
+        Fact_FinancialAndAccountingManagement[AjEntryDateID]
+    )
+)

@@ -1,0 +1,9 @@
+-- Mesure : MargeBeneficiaireMoyenne
+
+AVERAGEX(
+    'Fact_SalesPerformance',
+    DIVIDE(
+        'Fact_SalesPerformance'[Product_Price] - 'Fact_SalesPerformance'[Product_SupplierPrice],
+        'Fact_SalesPerformance'[Product_Price]
+    )
+)

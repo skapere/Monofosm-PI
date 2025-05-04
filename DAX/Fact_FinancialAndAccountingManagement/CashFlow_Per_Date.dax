@@ -1,0 +1,22 @@
+-- Mesure : CashFlow_Per_Date
+
+VAR SelectedDate = SELECTEDVALUE(DimDate[Year]) || SELECTEDVALUE(DimDate[Month]) || SELECTEDVALUE(DimDate[Day_Month])
+
+RETURN
+    IF (
+        ISBLANK(SelectedDate),
+        // Si aucune date sélectionnée → cashflow total (relation inactive)
+        FORMAT(
+            CALCULATE(SUM(Fact_FinancialAndAccountingManagement[CashFlow_Amount])),
+            "#,##0"
+        ) & " €",
+        
+        // Si une date est sélectionnée → cashflow filtré via relation active
+        FORMAT(
+            CALCULATE(
+                SUM(Fact_FinancialAndAccountingManagement[CashFlow_Amount]),
+                USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[CfTransactionDateID])
+            ),
+            "#,##0"
+        ) & " €"
+    ) 

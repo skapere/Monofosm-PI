@@ -1,0 +1,7 @@
+-- Mesure : FideliteParMagasin
+
+CALCULATE(
+    DISTINCTCOUNT(Fact_SalesPerformance[CustomerID]),
+    Fact_SalesPerformance[SalesTransactions_Amount] > 0,    USERELATIONSHIP(DimDate[PK_Date], Fact_SalesPerformance[StTransactionDateID])
+)
+

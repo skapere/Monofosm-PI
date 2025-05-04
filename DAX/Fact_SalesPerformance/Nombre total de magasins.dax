@@ -1,0 +1,2 @@
+-- Mesure : Nombre total de magasins
+DISTINCTCOUNT(DimStore[PK_Store])

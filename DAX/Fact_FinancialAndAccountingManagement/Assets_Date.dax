@@ -1,0 +1,8 @@
+-- Mesure : Assets_Date
+
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AF_Valeur_des_Actifs]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+)
+

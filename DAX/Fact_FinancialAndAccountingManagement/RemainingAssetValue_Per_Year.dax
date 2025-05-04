@@ -1,0 +1,24 @@
+-- Mesure : RemainingAssetValue_Per_Year
+
+
+
+VAR AmortissementCumule = 
+    
+        CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Amortissement_Cumule]),
+            USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+        )
+    
+VAR ValeurActifs = 
+          CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Valeur_des_Actifs]),
+            USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+        )
+VAR Ratio = 
+    IF (
+        ISBLANK(ValeurActifs),
+        BLANK(),
+         ( ValeurActifs - AmortissementCumule ) 
+    )
+RETURN
+        FORMAT(Ratio, "0.0##")

@@ -1,0 +1,5 @@
+-- Mesure : NombreClients_PeuRentable
+
+COUNTROWS(
+    FILTER(Fact_SalesPerformance, [CustomerProfitabilityLevel] = "Less Profitable")
+)

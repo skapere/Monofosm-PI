@@ -1,0 +1,7 @@
+-- Mesure : DepenseMoyenneParClient
+
+DIVIDE(
+    SUM(Fact_SalesPerformance[SalesTransactions_Amount]),
+    DISTINCTCOUNT(Fact_SalesPerformance[CustomerID])
+)
+

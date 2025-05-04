@@ -1,0 +1,5 @@
+-- Mesure : TotalAmountPaidBYaSupplier
+
+CALCULATE(
+SUM(Fact_FinancialAndAccountingManagement[PaymentsSupplier_Amount]),  
+USERELATIONSHIP(DimDate[PK_Date],Fact_FinancialAndAccountingManagement[FsStatementDateID]),  VALUES((DimSupplier[PK_Supplier])))

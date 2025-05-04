@@ -1,0 +1,2 @@
+-- Mesure : avg_variation
+AVERAGE(Fact_FinancialAndAccountingManagement[Bource_Variation])

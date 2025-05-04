@@ -1,0 +1,18 @@
+-- Mesure : ResolvedDisputeRate_Status
+
+VAR Rate =
+    CALCULATE(
+        DIVIDE([Total_disputes_resolues], [NombreLitiges], 0),
+        USERELATIONSHIP(DimDate[PK_Date], Fact_SupplierManagement[DisputeDateID])
+    )
+
+VAR RateFormatted = FORMAT(Rate, "0.00%")
+
+RETURN
+    SWITCH(
+        TRUE(),
+        Rate < 0.7, UNICHAR(128992) & " " & RateFormatted,     -- 🔵 Moins de 70%
+        Rate > 0.85, UNICHAR(128994) & " " & RateFormatted,    -- 🟢 Plus de 85%
+        RateFormatted                                        
+
+)

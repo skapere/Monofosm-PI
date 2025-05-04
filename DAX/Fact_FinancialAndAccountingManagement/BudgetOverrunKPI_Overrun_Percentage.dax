@@ -1,0 +1,29 @@
+-- Mesure : BudgetOverrunKPI_Overrun_Percentage
+
+VAR Budget = 
+    CALCULATE(
+        SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_Budget]),
+        USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[FsStatementDateID])
+    )
+
+VAR Depenses = 
+    CALCULATE(
+        SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_ActualExpenses]),
+        USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[FsStatementDateID])
+    )
+
+VAR Ecart = Depenses - Budget
+VAR EcartPourcentage = DIVIDE(Ecart, Budget)
+
+VAR FormattedValue = FORMAT(EcartPourcentage * 100, "0.0") & " %"
+
+RETURN
+    SWITCH(
+        TRUE(),
+        ISBLANK(EcartPourcentage), BLANK(),
+        EcartPourcentage <= -0.1, UNICHAR(128994) & " " & FormattedValue,   // 🟢
+        EcartPourcentage <= 0.05, "⚪ " & FormattedValue,                    // ⚪
+        EcartPourcentage <= 0.15, UNICHAR(128993) & " " & FormattedValue,   // 🟡
+        UNICHAR(128308) & " " & FormattedValue                              // 🔴
+    )
+

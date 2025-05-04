@@ -1,0 +1,28 @@
+-- Mesure : ratio_actifs_amortissmnts_ date
+
+VAR AmortissementCumule = 
+    
+        CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Amortissement_Cumule]),
+            USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+        )
+    
+VAR ValeurActifs = 
+          CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Valeur_des_Actifs]),
+            USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+        )
+//VAR Ratio = 
+RETURN
+    IF (
+        ISBLANK(ValeurActifs),
+        BLANK(),
+        (AmortissementCumule / ValeurActifs) 
+    )
+
+        //FORMAT(Ratio, "0.0##") & " %"
+    
+
+   
+
+

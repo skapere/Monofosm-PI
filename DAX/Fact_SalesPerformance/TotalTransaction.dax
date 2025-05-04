@@ -1,0 +1,4 @@
+-- Mesure : TotalTransaction
+
+CALCULATE(DISTINCTCOUNT(Fact_SalesPerformance[SalesTransactionsID]), USERELATIONSHIP(DimDate[PK_Date], Fact_SalesPerformance[StTransactionDateID]))
+

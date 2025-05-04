@@ -1,0 +1,8 @@
+-- Mesure : Investissements_Actifs_Date
+
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AF_Investissement_dans_les_Actifs]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+)
+

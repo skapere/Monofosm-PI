@@ -1,0 +1,11 @@
+-- Mesure : CustomerProfitabilityLevel
+
+VAR cpiClient = [CPI_Client]
+RETURN
+    SWITCH(
+        TRUE(),
+        cpiClient >= 1000, "Highly Profitable",
+        cpiClient >= 500, "Profitable",
+        cpiClient >= 100, "Less Profitable",
+        "Non rentable"
+    )

@@ -1,0 +1,6 @@
+-- Mesure : Change_Percent_Performance_YTD
+
+DIVIDE(
+    AVERAGE(Fact_FinancialAndAccountingManagement[Bource_ChangeSinceJan1st]),
+    AVERAGE(Fact_FinancialAndAccountingManagement[Bource_OpeningPrice])
+)

@@ -1,0 +1,9 @@
+-- Mesure : total_ecritures_grand_livre
+
+COUNTROWS(
+    FILTER(
+        RELATEDTABLE(DimGeneralLedger),
+        NOT ISBLANK(DimGeneralLedger[PK_GeneralLedger])
+    )
+)
+ //COUNTROWS(RELATEDTABLE(DimGeneralLedger))

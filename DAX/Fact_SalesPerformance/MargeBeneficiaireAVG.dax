@@ -1,0 +1,4 @@
+-- Mesure : MargeBeneficiaireAVG
+
+CALCULATE(([PrixVenteMoyen] - [PrixFournisseurMoyen]), USERELATIONSHIP(DimDate[PK_Date], Fact_SalesPerformance[StTransactionDateID]))
+

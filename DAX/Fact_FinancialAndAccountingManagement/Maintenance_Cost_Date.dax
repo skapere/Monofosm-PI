@@ -1,0 +1,8 @@
+-- Mesure : Maintenance_Cost_Date
+
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AF_Cout_de_Maintenance]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+)
+

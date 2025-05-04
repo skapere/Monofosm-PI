@@ -1,0 +1,4 @@
+-- Mesure : PrixFournisseurMoyen
+
+AVERAGE(Fact_SalesPerformance[Product_SupplierPrice])
+

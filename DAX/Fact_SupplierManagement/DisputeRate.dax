@@ -1,0 +1,11 @@
+-- Mesure : DisputeRate
+
+CALCULATE(
+    DIVIDE(
+        [NombreLitiges],
+        [NombreFacturesFournisseurs],
+        0  // ici on evite la division par 0
+    ),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_SupplierManagement[DisputeDateID])
+)
+

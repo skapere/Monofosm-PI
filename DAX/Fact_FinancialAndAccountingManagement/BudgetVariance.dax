@@ -1,0 +1,12 @@
+-- Mesure : BudgetVariance
+
+ CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_ActualExpenses]) 
+    - 
+    SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_Budget]),
+    USERELATIONSHIP(
+        DimDate[PK_Date], 
+        Fact_FinancialAndAccountingManagement[FsStatementDateID]
+    )
+) 
+

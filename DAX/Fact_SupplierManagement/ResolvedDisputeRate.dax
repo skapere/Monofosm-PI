@@ -1,0 +1,7 @@
+-- Mesure : ResolvedDisputeRate
+
+
+    CALCULATE(
+        DIVIDE([Total_disputes_resolues], [NombreLitiges], 0),
+        USERELATIONSHIP(DimDate[PK_Date], Fact_SupplierManagement[DisputeDateID])
+    )

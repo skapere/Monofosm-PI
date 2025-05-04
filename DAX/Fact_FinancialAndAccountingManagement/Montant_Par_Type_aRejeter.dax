@@ -1,0 +1,7 @@
+-- Mesure : Montant_Par_Type_aRejeter
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AJ_DebitAmount]),
+      ALLEXCEPT(DimGeneralLedger, DimGeneralLedger[Type])
+)
+

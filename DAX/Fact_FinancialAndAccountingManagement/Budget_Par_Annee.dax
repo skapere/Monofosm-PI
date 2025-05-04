@@ -1,0 +1,7 @@
+-- Mesure : Budget_Par_Annee
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_Budget]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[FsStatementDateID])
+)
+

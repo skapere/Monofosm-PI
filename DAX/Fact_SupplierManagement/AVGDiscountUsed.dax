@@ -1,0 +1,4 @@
+-- Mesure : AVGDiscountUsed
+
+
+CALCULATE( AVERAGE(Fact_SupplierManagement[PaymentsSupplier_DiscountUsed]),USERELATIONSHIP(DimDate[PK_Date],Fact_FinancialAndAccountingManagement[PsDateID]))

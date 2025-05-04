@@ -1,0 +1,2 @@
+-- Mesure : avg_tradingVolume
+AVERAGE(Fact_FinancialAndAccountingManagement[Bource_TradingVolume])

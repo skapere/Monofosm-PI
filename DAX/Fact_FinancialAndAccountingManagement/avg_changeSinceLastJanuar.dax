@@ -1,0 +1,2 @@
+-- Mesure : avg_changeSinceLastJanuar
+AVERAGE(Fact_FinancialAndAccountingManagement[Bource_ChangeSinceJan1st])

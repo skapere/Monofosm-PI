@@ -1,0 +1,3 @@
+-- Mesure : MargeRecommandeePct
+
+AVERAGE(Fact_SalesPerformance[Product_RecommendedProfitMargin])

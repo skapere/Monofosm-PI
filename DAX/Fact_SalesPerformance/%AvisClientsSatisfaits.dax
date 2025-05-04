@@ -1,0 +1,11 @@
+-- Mesure : %AvisClientsSatisfaits
+
+CALCULATE(
+    AVERAGE(Fact_SalesPerformance[Product_AverageRating]),
+    FILTER(
+        Fact_SalesPerformance,
+        Fact_SalesPerformance[Product_AverageRating] > 4 
+        && Fact_SalesPerformance[Product_NumberOfReviews] <> 0
+    )
+)
+

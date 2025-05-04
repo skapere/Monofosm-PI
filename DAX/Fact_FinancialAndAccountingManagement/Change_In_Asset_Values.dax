@@ -1,0 +1,53 @@
+-- Mesure : Change_In_Asset_Values
+
+VAR SelectedAnnualFinancesID = SELECTEDVALUE(DimAnnualFinances[PK_AnnualFinances])
+
+// on verifie si un code est selectionne 
+VAR ValeurActifsAnneeX =
+    IF (
+        ISBLANK(SelectedAnnualFinancesID),
+        BLANK(),
+        CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AF_Valeur_des_Actifs]),
+    Fact_FinancialAndAccountingManagement[AnnualFinancesID] = SelectedAnnualFinancesID
+)
+    )
+
+// ici on trouve l'annee precedente
+VAR AnneePrecedente = SelectedAnnualFinancesID - 1
+    /*IF (
+        NOT ISBLANK(SelectedAnnualFinancesID),
+        CALCULATE(
+            MAX(DimAnnualFinances[Code AnnualFinances]),
+            DimAnnualFinances[Code AnnualFinances] < SelectedAnnualFinancesID
+        ),
+        BLANK() 
+    )*/
+
+-- ici on recupere la valeur des actifs pour the previous year
+VAR ValeurActifsAnneeX_1 =
+    IF (
+        NOT ISBLANK(AnneePrecedente),
+        CALCULATE(
+            SUM(Fact_FinancialAndAccountingManagement[AF_Valeur_des_Actifs]),
+            Fact_FinancialAndAccountingManagement[AnnualFinancesID] = AnneePrecedente
+        ),
+        BLANK() // ou une autre valeur par défaut si nécessaire
+    )
+
+-- Calcul du ratio de variation des actifs
+VAR Ratio =
+    IF (
+        ISBLANK(ValeurActifsAnneeX) || ISBLANK(ValeurActifsAnneeX_1),
+        BLANK(),
+        (ValeurActifsAnneeX / ValeurActifsAnneeX_1) * 100
+    )
+
+-- Affichage du résultat
+RETURN
+    IF (
+        ISBLANK(SelectedAnnualFinancesID),
+        "Please select an annual code",
+        FORMAT(Ratio, "0.##") & " %"
+    )
+

@@ -1,0 +1,7 @@
+-- Mesure : NombreLitigesParRaison
+
+CALCULATE(
+    [NombreLitiges],
+    VALUES(DimDispute[Reason])
+)
+

@@ -1,0 +1,25 @@
+-- Mesure : FlècheKPIChargeDepenseActuelles
+
+VAR variation = [Charge DepensesActuelles Annuelle]
+VAR fleche = 
+    SWITCH(
+        TRUE(),
+        variation > 0, "🔺",
+        variation < 0, "🔻",
+        "⏺"
+    )
+
+VAR AnneeSelectionnee =
+    SELECTEDVALUE('DimDate'[Year])
+
+VAR TexteAnnee =
+    IF(
+        ISBLANK(AnneeSelectionnee),
+        "",
+        AnneeSelectionnee & " - " & (AnneeSelectionnee - 1)
+    )
+
+RETURN
+    fleche & " " & FORMAT(variation, "#,##0.00") & " €"
+    & UNICHAR(10) &
+    TexteAnnee

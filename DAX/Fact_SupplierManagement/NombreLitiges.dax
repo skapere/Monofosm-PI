@@ -1,0 +1,7 @@
+-- Mesure : NombreLitiges
+
+CALCULATE(
+    COUNTROWS(Fact_SupplierManagement),
+    NOT(ISBLANK(Fact_SupplierManagement[DisputeID])) , USERELATIONSHIP(DimDate[PK_Date],Fact_SupplierManagement[DisputeDateID])
+)
+

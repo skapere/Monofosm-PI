@@ -1,0 +1,13 @@
+-- Mesure : Total_disputes_resolues
+
+CALCULATE (
+    COUNTROWS (Fact_SupplierManagement),
+    FILTER (
+        Fact_SupplierManagement,
+        RELATED (DimDispute[Status]) = "Résolu"
+            && NOT (ISBLANK (Fact_SupplierManagement[DisputeID]))
+    ),
+    USERELATIONSHIP (DimDate[PK_Date], Fact_SupplierManagement[DisputeDateID])
+)
+
+

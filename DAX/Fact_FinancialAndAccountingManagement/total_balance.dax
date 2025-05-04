@@ -1,0 +1,14 @@
+-- Mesure : total_balance
+
+
+CALCULATE(
+    (
+        SUM(Fact_FinancialAndAccountingManagement[AJ_CreditAmount]) 
+        - SUM(Fact_FinancialAndAccountingManagement[AJ_DebitAmount])
+    ) 
+    ,
+    USERELATIONSHIP(
+        DimDate[PK_Date], 
+        Fact_FinancialAndAccountingManagement[AjEntryDateID]
+    )
+)

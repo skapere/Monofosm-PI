@@ -1,0 +1,2 @@
+-- Mesure : NombreTotalClients
+DISTINCTCOUNT(DimCustomer[PK_Customer])

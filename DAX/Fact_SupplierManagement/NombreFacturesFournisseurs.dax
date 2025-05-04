@@ -1,0 +1,6 @@
+-- Mesure : NombreFacturesFournisseurs
+
+CALCULATE(
+    COUNTROWS(Fact_SupplierManagement),
+    NOT(ISBLANK(Fact_SupplierManagement[InvoiceID])) , USERELATIONSHIP(DimDate[PK_Date],Fact_SupplierManagement[InvoiceDateID])
+)

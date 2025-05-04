@@ -1,0 +1,13 @@
+-- Mesure : total_credit_valide
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AJ_CreditAmount]),
+    FILTER(
+        DimAccountingJournal,
+        DimAccountingJournal[isValid] = TRUE()
+    ),
+    USERELATIONSHIP(
+        DimDate[PK_Date], 
+        Fact_FinancialAndAccountingManagement[AjEntryDateID]
+    )
+)

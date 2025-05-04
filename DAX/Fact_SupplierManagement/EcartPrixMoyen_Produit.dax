@@ -1,0 +1,12 @@
+-- Mesure : EcartPrixMoyen_Produit
+
+CALCULATE(
+    AVERAGE(Fact_SupplierManagement[EcartPrixColonne]),
+    FILTER(
+        Fact_SupplierManagement,
+        NOT ISBLANK(Fact_SupplierManagement[Product_Price]) &&
+        NOT ISBLANK(Fact_SupplierManagement[Product_SupplierPrice])
+    )
+)
+
+

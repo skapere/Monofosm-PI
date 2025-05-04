@@ -1,0 +1,6 @@
+-- Mesure : CoutMoyenCategorie
+AVERAGEX(
+    VALUES(DimCategory[PK_Category]),
+    CALCULATE(AVERAGE(Fact_SupplierManagement[InvoiceItems_UnitPrice]))
+)
+

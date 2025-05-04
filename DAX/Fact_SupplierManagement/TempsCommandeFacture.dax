@@ -1,0 +1,14 @@
+-- Mesure : TempsCommandeFacture
+
+AVERAGEX(
+    FILTER(
+        Fact_SupplierManagement,
+        NOT(ISBLANK(Fact_SupplierManagement[InvoicePaymentDueDateID])) &&
+        NOT(ISBLANK(Fact_SupplierManagement[InvoiceDateID]))
+    ), 
+     DATEDIFF(
+            LOOKUPVALUE(DimDate[Full Date], DimDate[PK_Date], Fact_SupplierManagement[InvoiceDateID]),
+            LOOKUPVALUE(DimDate[Full Date], DimDate[PK_Date], Fact_SupplierManagement[InvoicePaymentDueDateID]),
+            DAY ))
+    
+

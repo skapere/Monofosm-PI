@@ -1,0 +1,3 @@
+-- Mesure : PrixVenteMoyen
+
+AVERAGE(Fact_SalesPerformance[Product_Price])

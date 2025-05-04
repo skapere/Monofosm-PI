@@ -1,0 +1,8 @@
+-- Mesure : CPI_Client
+
+DIVIDE(
+    SUM(Fact_SalesPerformance[SalesTransactions_Amount]),
+    DISTINCTCOUNT(Fact_SalesPerformance[SalesTransactionsID]),
+    0
+)
+

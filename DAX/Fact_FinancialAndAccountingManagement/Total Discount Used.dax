@@ -1,0 +1,5 @@
+-- Mesure : Total Discount Used
+
+CALCULATE(
+SUM(Fact_SupplierManagement[PaymentsSupplier_DiscountUsed]),
+USERELATIONSHIP(DimDate[PK_Date],Fact_FinancialAndAccountingManagement[FsStatementDateID]))

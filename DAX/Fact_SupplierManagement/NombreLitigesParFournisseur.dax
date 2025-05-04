@@ -1,0 +1,8 @@
+-- Mesure : NombreLitigesParFournisseur
+
+CALCULATE(
+    COUNTROWS(Fact_SupplierManagement),
+    VALUES(DimSupplier[PK_Supplier])
+)
+
+

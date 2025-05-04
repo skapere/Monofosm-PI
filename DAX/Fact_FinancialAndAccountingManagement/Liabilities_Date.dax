@@ -1,0 +1,7 @@
+-- Mesure : Liabilities_Date
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_TotalLiabilities]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[FsStatementDateID])
+)
+

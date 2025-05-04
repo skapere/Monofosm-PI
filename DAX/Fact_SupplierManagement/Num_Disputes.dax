@@ -1,0 +1,7 @@
+-- Mesure : Num_Disputes
+
+CALCULATE(
+    DISTINCTCOUNT(Fact_SupplierManagement[DisputeID]),
+    USERELATIONSHIP(Fact_SupplierManagement[DisputeDateID], DimDate[PK_Date]),
+    NOT(ISBLANK(Fact_SupplierManagement[DisputeID]))
+)

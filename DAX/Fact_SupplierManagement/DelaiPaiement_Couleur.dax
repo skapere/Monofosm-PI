@@ -1,0 +1,13 @@
+-- Mesure : DelaiPaiement_Couleur
+
+VAR Duree = [DelaiPaiementMoyen]
+RETURN
+    SWITCH(
+        TRUE(),
+        ISBLANK(Duree), "Transparent",
+        Duree <= 10, "#4CAF50",       -- Vert
+        Duree <= 30, "#FFC107",       -- Orange
+        Duree > 30, "#F44336",        -- Rouge
+        "Gray"                        -- Couleur par défaut
+    )
+

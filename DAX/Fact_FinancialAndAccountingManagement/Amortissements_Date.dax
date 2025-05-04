@@ -1,0 +1,8 @@
+-- Mesure : Amortissements_Date
+
+
+CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[AF_Amortissement_Cumule]),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_FinancialAndAccountingManagement[AnnualFinancesDateID])
+)
+

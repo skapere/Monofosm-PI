@@ -1,0 +1,12 @@
+-- Mesure : MoyenneAvisParProduit
+
+CALCULATE(
+    AVERAGEX(
+        FILTER(
+            Fact_SalesPerformance,
+            Fact_SalesPerformance[Product_NumberOfReviews] <> 0
+        ),
+        Fact_SalesPerformance[Product_AverageRating]
+    ),
+    USERELATIONSHIP(DimDate[PK_Date], Fact_SalesPerformance[StTransactionDateID])
+)

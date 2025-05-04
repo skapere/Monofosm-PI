@@ -1,0 +1,20 @@
+-- Mesure : LiquidityRatio_DateEtatFinancier
+
+ var CurrentRate = CALCULATE(
+    SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_TotalAssets]) 
+  /
+    SUM(Fact_FinancialAndAccountingManagement[FinancialStatements_TotalLiabilities]),
+    USERELATIONSHIP(
+        DimDate[PK_Date], 
+        Fact_FinancialAndAccountingManagement[FsStatementDateID]
+    )
+)  
+
+VAR FormattedRate = FORMAT(CurrentRate, "0.00")  
+RETURN 
+    SWITCH(
+        TRUE(),
+        CurrentRate > 1.5, UNICHAR(128994) & " " & FormattedRate,  
+        CurrentRate < 1, UNICHAR(128308) & " " & FormattedRate,  
+        "⚪ " & FormattedRate  )
+
