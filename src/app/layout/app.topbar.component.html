@@ -48,7 +48,7 @@
       ></button>
 
       <button
-        *ngIf="role === 'tests'"
+        *ngIf="role === 'Sales'"
         pButton
         pRipple
         label="Store Layout Generator"
@@ -193,125 +193,65 @@
   </p-dialog>
 
   <p-dialog header="Store Layout Generator" [(visible)]="StoreLayoutDialog" [style]="{ width: '80%' }">
-    <div class="formgroup-inline" style="margin-bottom: 1rem; padding-top: 1rem; ">
-      <div class="p-float-label" >
-        <p-dropdown
-          [options]="[
-          { label: 'Rectangle', value: 'rectangle' },
-          { label: 'L-shape', value: 'L-shape' },
-          { label: 'Custom', value: 'custom' }
-        ]"
-          [(ngModel)]="layoutShape"
-          id="layoutShape">
-        </p-dropdown>
-        <label for="layoutShape">Shape</label>
-      </div>
 
-      <div class="p-float-label">
-        <input type="number" pInputText [(ngModel)]="layoutWidth" />
-        <label>Width</label>
+      <div class="formgroup-inline" style="margin-top: 10px;">
+        <div class="p-float-label">
+          <input id="width" type="number" [(ngModel)]="storeWidth" pInputText />
+          <label for="width">Store Width (m)</label>
+        </div>
+        <div class="p-float-label">
+          <input id="height" type="number" [(ngModel)]="storeHeight" pInputText />
+          <label for="height">Store Height (m)</label>
+        </div>
+        <div class="p-float-label">
+          <input id="cellSize" type="number" [(ngModel)]="cellSize" pInputText />
+          <label for="cellSize">Cell Size (m)</label>
+        </div>
+        <button pButton label="Generate Layout" (click)="generateLayout()"></button>
       </div>
-      <div class="p-float-label">
-        <input type="number" pInputText [(ngModel)]="layoutHeight" />
-        <label>Height</label>
-      </div>
-      <div class="field-checkbox">
-        <p-checkbox name="butcher" [(ngModel)]="includeButcher" binary="true" id="butcher"></p-checkbox>
-        <label for="butcher">Include Butcher</label>
-      </div>
-      <div class="field-checkbox">
-        <p-checkbox name="fruits" [(ngModel)]="includeFruitsVegetables" binary="true" id="fruits"></p-checkbox>
-        <label for="fruits">Fruits & Vegetables</label>
-      </div>
-      <div class="field-checkbox">
-        <p-checkbox name="spices" [(ngModel)]="includeSpices" binary="true" id="spices" ></p-checkbox>
-        <label for="spices">Spices</label>
-      </div>
-      <div class="field-checkbox">
-        <p-checkbox name="staff" [(ngModel)]="includeStaffRoom" binary="true" id="staff"></p-checkbox>
-        <label for="staff">Staff Room</label>
-      </div>
-
-
-      <button pButton (click)="generateLayout()" [disabled]="loadingLayout">
-        {{ loadingLayout ? 'Generating...' : 'Generate Layout' }}
-      </button>
-    </div>
-
-    <div class="p-field p-grid">
-      <label class="p-col-fixed" style="width: 120px">Select Cell Type:</label>
+    <div class="p-field">
+      <label for="zoneType">Select Zone Type:</label>
       <p-dropdown
-        [options]="cellTypes"
-        [(ngModel)]="selectedCellType"
-        optionLabel="label"
-        placeholder="Select a type">
+        id="zoneType"
+        [options]="zoneTypes"
+        [(ngModel)]="selectedZoneType"
+        placeholder="Select zone type"
+        [style]="{ width: '200px' }">
       </p-dropdown>
+      <button pButton label="Optimize Layout" (click)="optimizeStoreLayout()" class="p-button-success" style="margin-top: 10px;"></button>
     </div>
 
-    <div *ngIf="storeLayout.length > 0">
-      <h5>Layout Preview</h5>
-      <div
-        [ngStyle]="{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(' + layoutWidth + ', 50px)',
-      gap: '4px'
-    }"
-      >
-        <ng-container *ngFor="let row of storeLayout; let rowIndex = index; trackBy: trackByIndex">
-          <ng-container *ngFor="let cell of row; let colIndex = index; trackBy: trackByIndex">
-            <div
-              (click)="onCellClick(rowIndex, colIndex)"
-              [ngStyle]="{
-        width: '50px',
-        height: '50px',
-        backgroundColor: getCellColor(cell),
-        border: '1px solid #ccc',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '12px',
-        cursor: 'pointer'
-      }"
-            >
-              {{ getCellEmogie(cell) }}
-            </div>
-          </ng-container>
+
+    <!-- After generation, display basic grid (e.g., as table or canvas) -->
+    <div *ngIf="layout" style="display: grid;" [ngStyle]="{
+  gridTemplateColumns: 'repeat(' + layout[0]?.length + ', 50px)',
+  gap: '2px'
+}">
+      <ng-container *ngFor="let row of layout; let rowIndex = index">
+        <ng-container *ngFor="let cell of row; let colIndex = index">
+          <div
+            (click)="onCellClick(rowIndex, colIndex)"
+            [ngStyle]="{
+          width: '50px',
+          height: '50px',
+          backgroundColor: getCellColor(rowIndex,colIndex),
+          border: '1px solid #ccc',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '10px',
+          textAlign: 'center',
+          cursor: 'pointer'
+        }"
+          >
+            {{ getCellEmogie(rowIndex,colIndex) }}
+          </div>
         </ng-container>
-
-
-      </div>
-      <br />
-      <button pButton (click)="arrangeProducts()" [disabled]="loadingArrangement">
-        {{ loadingArrangement ? 'Arranging...' : 'Arrange Products' }}
-      </button>
+      </ng-container>
     </div>
 
 
-
-
-    <div *ngIf="arrangedProducts.length > 0" style="margin-top: 1rem;">
-      <h5>Product Arrangement</h5>
-      <p-table [value]="arrangedProducts" responsiveLayout="scroll">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Product 1</th>
-            <th>Product 2</th>
-            <th>Score</th>
-            <th>Position 1</th>
-            <th>Position 2</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-p>
-          <tr>
-            <td>{{ p.product1 }}</td>
-            <td>{{ p.product2 }}</td>
-            <td>{{ (p.score * 100) | number:'1.2-2' }}%</td>
-            <td>{{ p.product1_position.join(', ') }}</td>
-            <td>{{ p.product2_position.join(', ') }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
   </p-dialog>
+
 
 </div>

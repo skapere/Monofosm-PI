@@ -4,7 +4,7 @@ import {LayoutService} from "./service/app.layout.service";
 import {AuthService} from '../demo/service/auth.service';
 import {Router} from '@angular/router';
 import {UserService} from "../demo/service/user.service";
-import {Dm} from "../demo/api/dm.model";
+import {Cell} from "../demo/api/cell.model";
 import {ChatStockService} from "../demo/service/chatstock.service";
 import {supplierService} from "../demo/service/supplier.service";
 import {SalesService} from "../demo/service/sales.service";
@@ -51,14 +51,13 @@ export class AppTopBarComponent {
   supplierRecommendations: any[] = [];
   SalesRecommendations: any[] = [];
 
-  storeLayout: string[][] = [];
+  /*storeLayout: string[][] = [];
   arrangedProducts: any[] = [];
   layoutShape: string = 'rectangle';
   layoutWidth: number = 5;
   layoutHeight: number = 5;
   loadingLayout = false;
   loadingArrangement = false;
-  StoreLayoutDialog: boolean = false;
   includeButcher = false;
   includeFruitsVegetables = false;
   includeSpices = false;
@@ -81,7 +80,32 @@ export class AppTopBarComponent {
     { label: 'Butcher', value: 'Butcher' },
     { label: 'Fruits & Veg', value: 'FruitsVeg' },
     { label: 'Spices', value: 'Spices' },
+  ];*/
+
+
+  // Region Store layout
+
+  StoreLayoutDialog: boolean = false;
+
+  storeWidth: number = 10;
+  storeHeight: number = 10;
+  cellSize: number = 1;
+
+  layout: Cell[][] = [];
+  loadingLayout: boolean = false;
+
+  selectedZoneType: string = 'Empty'; // default selected zone
+
+  zoneTypes: string[] = [
+    'Empty', 'Walkway', 'Door'
   ];
+
+  //End Store layout
+
+
+  loading: boolean = false;
+  loadingSupplier: boolean = false;
+  loadingSales: boolean = false;
 
 
 
@@ -124,7 +148,6 @@ export class AppTopBarComponent {
 
     this.loadUsername();
   }
-
   arePasswordsMatching(): boolean {
     this.isPasswordMatch = this.passwordValue === this.ConfirmPasswordValue;
     if(!this.isPasswordMatch)
@@ -133,10 +156,23 @@ export class AppTopBarComponent {
     }
     return this.isPasswordMatch;
   }
-
-
-
-
+  getRoleClass(role: string | null): string {
+    if(role)
+    {
+      if (role === 'Finance') {
+        return 'qualified';
+      } else if (role === 'Supplier Management') {
+        return 'proposal';
+      } else if (role === 'Sales') {
+        return 'renewal';
+      } else {
+        return 'unqualified';
+      }
+    }
+    else {
+      return 'new';
+    }
+  }
   loadUsername() {
     this.tieredItems = [
       {
@@ -164,29 +200,21 @@ export class AppTopBarComponent {
       { separator: true },
     ];
   }
-
   logout() {
     this.authService.logout();
     this.userName = null;
     this.ngOnInit();
     this.router.navigate(['/auth/login']);
   }
-
   showDialog() {
     this.visible = true;
   }
-
   showChatBotDialog() {
     this.chatbotdialog = this.role == 'Finance';
     this.SupplierRecommendationdialog = this.role == 'Supplier Management';
     this.SalesRecommendationdialog = this.role == 'Sales';
 
   }
-
-  loading: boolean = false;
-  loadingSupplier: boolean = false;
-  loadingSales: boolean = false;
-
   submitSalesRecommendation() {
     if (this.loadingSales || !this.pairsnumber) return;
 
@@ -212,7 +240,6 @@ export class AppTopBarComponent {
 
   submitSupplierRecommendation() {
     if (this.loadingSupplier || !this.selectedCategory) return;
-
     this.loadingSupplier = true;
     const selectedCategoryLabel = this.CategoryOptions.find(c => c.value === this.selectedCategory)?.label;
 
@@ -235,109 +262,6 @@ export class AppTopBarComponent {
         }
       });
   }
-
-
-
-  /*submitChat() {
-    if (this.loading) return;
-
-    const selectedStockLabel = this.stockOptions.find(s => s.value === this.selectedstock)?.label;
-    let observable: Observable<any>;
-    let userQuestion = this.question;
-
-    if (this.selectedOption === 'chatbot') {
-      if (!userQuestion.trim()) return;
-      observable = this.ChatStockService.getChatbotResponse(userQuestion);
-    } else {
-      if (!this.selectedOption || !selectedStockLabel) return;
-
-      switch (this.selectedOption) {
-        case 'anomal':
-          observable = this.ChatStockService.getAnomalies(selectedStockLabel);
-          userQuestion = `What are the anomalies for ${selectedStockLabel}?`;
-          break;
-        case 'performance':
-          observable = this.ChatStockService.getPerformance(selectedStockLabel);
-          userQuestion = `What is the performance of ${selectedStockLabel}?`;
-          break;
-        case 'predict':
-          observable = this.ChatStockService.getForecast(selectedStockLabel);
-          userQuestion = `What is the forecast for ${selectedStockLabel}?`;
-          break;
-        case 'risk':
-          observable = this.ChatStockService.getRisk(selectedStockLabel);
-          userQuestion = `What is the risk for ${selectedStockLabel}?`;
-          break;
-        default:
-          return;
-      }
-    }
-
-    this.loading = true;
-
-    observable.subscribe({
-      next: (data) => {
-        let botReply = '';
-
-        switch (this.selectedOption) {
-          case 'chatbot':
-            botReply = data.response;
-            break;
-          case 'anomal':
-            const anomalies = data.anomalies;
-            if (anomalies?.length > 0) {
-              botReply = anomalies.map((a: any, i: number) =>
-                `Anomaly ${i + 1}:\n- Date: ${new Date(a.SEDate.$date).toLocaleDateString()}\n- Price: ${a.LastPrice.toFixed(4)}\n- Volume: ${a.TradingVolume.toFixed(4)}\n- Reason: ${a.Reason}`
-              ).join('\n\n');
-            } else {
-              botReply = "No anomalies detected for this stock.";
-            }
-            break;
-          case 'performance':
-            const perf = data.performance;
-            botReply = `Stock Performance:\n- Average Return: ${perf.AverageReturn.toFixed(2)}\n- Volatility: ${perf.Volatility.toFixed(2)}\n- Trend: ${perf.Trend}`;
-            break;
-          case 'predict':
-            const forecast = data.forecast;
-            botReply = `7-Day Forecast:\n- Predicted Change: ${forecast.PredictedChange.toFixed(2)}%\n- Confidence: ${forecast.Confidence.toFixed(2)}%`;
-            break;
-          case 'risk':
-            botReply = `1-Day Value at Risk (95%): ${data.VaR_1day_95pct.toFixed(2)}`;
-            break;
-        }
-
-        this.chatbotReponces.push({
-          question: userQuestion,
-          response: botReply
-        });
-
-        this.question = '';
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('API failed, falling back to chatbot:', error);
-
-        this.ChatStockService.getChatbotResponse(userQuestion).subscribe({
-          next: (fallbackData) => {
-            this.chatbotReponces.push({
-              question: userQuestion,
-              response: fallbackData.response
-            });
-            this.loading = false;
-          },
-          error: (fallbackError) => {
-            console.error('Fallback chatbot also failed:', fallbackError);
-            this.chatbotReponces.push({
-              question: userQuestion,
-              response: "An error occurred. Please try again later."
-            });
-            this.loading = false;
-          }
-        });
-      }
-    });
-  }*/
-
   private prepareUserQuestion(): string | null {
     if (this.selectedOption === 'chatbot') {
       return this.question.trim() ? this.question : null;
@@ -363,7 +287,6 @@ export class AppTopBarComponent {
 
     return this.question;
   }
-
   private getObservable(userQuestion: string): Observable<any> {
     const selectedStockLabel = this.stockOptions.find(s => s.value === this.selectedstock)?.label;
 
@@ -382,7 +305,6 @@ export class AppTopBarComponent {
         throw new Error('Invalid option selected');
     }
   }
-
   private formatAnomalies(anomalies: any[]): string {
     if (!anomalies?.length) return "No anomalies detected for this stock.";
 
@@ -390,8 +312,6 @@ export class AppTopBarComponent {
       `Anomaly ${i + 1}:\n- Date: ${new Date(a.SEDate.$date).toLocaleDateString()}\n- Price: ${a.LastPrice.toFixed(4)}\n- Volume: ${a.TradingVolume.toFixed(4)}\n- Reason: ${a.Reason}`
     ).join('\n\n');
   }
-
-
   private handleResponse(data: any, userQuestion: string): void {
     let botReply = '';
 
@@ -419,7 +339,6 @@ export class AppTopBarComponent {
     this.question = '';
     this.loading = false;
   }
-
   private handleError(error: any, userQuestion: string): void {
     console.error('API failed, falling back to chatbot:', error);
 
@@ -441,8 +360,6 @@ export class AppTopBarComponent {
       }
     });
   }
-
-
   submitChat() {
     if (this.loading) return;
 
@@ -458,15 +375,7 @@ export class AppTopBarComponent {
     });
   }
 
-
-
-
-
-  //!----------------------------
-
-  openStoreLayoutDialog() {
-    this.StoreLayoutDialog = true;
-  }
+  /*
 
   generateLayout() {
     this.loadingLayout = true;
@@ -524,6 +433,7 @@ export class AppTopBarComponent {
   getCellColor(cell: string): string {
     switch (cell) {
       case 'Walkway': return '#f0f0f0';
+      case 'Empty': return '#e1e1e1';
       case 'Aisle': return '#8bc34a';
       case 'Cashier': return '#03a9f4';
       case 'Door': return '#ff5722';
@@ -537,6 +447,7 @@ export class AppTopBarComponent {
 
   getCellEmogie(cell: string): string {
     switch (cell) {
+      case 'Empty': return 'Empty';
       case 'Walkway': return 'Walkway';
       case 'Aisle': return 'Aisle';
       case 'Cashier': return '💰 Cashiers';
@@ -570,26 +481,106 @@ export class AppTopBarComponent {
     this.storeLayout[row] = updatedRow;
     this.storeLayout = [...this.storeLayout];
   }
+*/
 
+  //Region Store layout
+  openStoreLayoutDialog() {
+    this.StoreLayoutDialog = true;
+    this.zoneTypes = [
+      'Empty', 'Walkway', 'Door'
+    ];
+  }
 
-  getRoleClass(role: string | null): string {
-    if(role)
-    {
-      const lowercaseStocks = role;
-      if (lowercaseStocks === 'Admin') {
-        return 'qualified';
-      } else if (lowercaseStocks === 'Medecin') {
-        return 'proposal';
-      } else if (lowercaseStocks === 'Patient') {
-        return 'renewal';
-      } else {
-        return 'unqualified';
+  generateLayout(): void {
+    this.loadingLayout = true;
+
+    this.zoneTypes = [
+      'Empty', 'Walkway', 'Door'
+    ];
+
+    const params = {
+      width: this.storeWidth,
+      height: this.storeHeight,
+      cell_size: this.cellSize
+    };
+
+    this.salesService.generateLayoutTemplate('generate_layout_template', params).subscribe({
+      next: (data) => {
+        this.layout = data.grid;
+        this.loadingLayout = false;
+      },
+      error: (error) => {
+        console.error('Error generating layout:', error);
+        this.loadingLayout = false;
       }
-    }
-    else {
-      return 'new';
+    });
+
+  }
+
+  optimizeStoreLayout(): void {
+    const payload = {
+      grid: this.layout,
+      rows: this.layout.length,
+      cols: this.layout[0]?.length || 0,
+      cell_size: this.cellSize
+    };
+
+    this.zoneTypes = [
+      'Empty', 'Walkway', 'Aisle', 'Cashier',
+      'Door', 'StaffRoom', 'Butcher', 'FruitsVeg', 'Spices'
+    ];
+
+    this.salesService.optimizeLayout('optimize_layout', payload).subscribe({
+      next: (data) => {
+        this.layout = data.grid;
+      },
+      error: (error) => {
+        console.error('Error optimizing layout:', error);
+      }
+    });
+  }
+
+
+
+  getCellColor(row: number,cell: number): string {
+    switch (this.layout[row][cell].type) {
+      case 'Empty': return '#e1e1e1';
+      case 'Walkway': return '#f0f0f0';
+      case 'Aisle': return '#8bc34a';
+      case 'Cashier': return '#03a9f4';
+      case 'Door': return '#ff5722';
+      case 'StaffRoom': return '#9c27b0';
+      case 'Butcher': return '#795548';
+      case 'FruitsVeg': return '#ffc107';
+      case 'Spices': return '#ff9800';
+      default: return '#e0e0e0';
     }
   }
+
+  getCellEmogie(row: number, cell: number): string {
+    switch (this.layout[row][cell].type) {
+      case 'Empty': return 'Empty';
+      case 'Walkway': return 'Walkway';
+      case 'Aisle': return 'Aisle';
+      case 'Cashier': return '💰 Cashiers';
+      case 'Door': return '🚪 Door';
+      case 'StaffRoom': return '👥 Staff Room';
+      case 'Butcher': return '🥩 Butcher';
+      case 'FruitsVeg': return '🍎 Fruits & Veg';
+      case 'Spices': return '🧂 Spices';
+      default: return '';
+    }
+  }
+
+  onCellClick(row: number, col: number): void {
+    if (this.layout && this.layout[row] && this.layout[row][col]) {
+      this.layout[row][col].type = this.selectedZoneType;
+    }
+  }
+
+
+
+
 
 
 }

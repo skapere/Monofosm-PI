@@ -29,6 +29,23 @@ export class SalesService {
     });
   }
 
+  //Region Store Layout
+
+
+  generateLayoutTemplate(endpoint: string, params: any): Observable<any> {
+    return this.http.get(`http://localhost:5000/api/${endpoint}`, { params });
+  }
+
+  optimizeLayout(endpoint: string, payload: any): Observable<any> {
+    return this.http.post(`http://localhost:5000/api/${endpoint}`, payload);
+  }
+
+
+
+  //End Store layout
+
+
+  /*
   generateStoreLayout(
     shape: string,
     width: number,
@@ -59,7 +76,7 @@ export class SalesService {
       headers: this.getHeaders()
     });
   }
-
+*/
 
 
 
