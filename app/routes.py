@@ -7,12 +7,13 @@ from app.ml_models import (
     get_top_product_pairs, ask_llm, compute_var, forecast_stock, get_performance_for_stock, get_anomalies_for_stock,
     predict_dispute
 )
-from app.layout_optimizer import generate_store_layout, arrange_products
+from app.layout_optimizer import generate_layout_template, optimize_layout
 import jwt
 import datetime
 from flask import current_app as app
 import os
 from dotenv import load_dotenv
+from flask_cors import cross_origin
 
 load_dotenv()
 
@@ -349,93 +350,68 @@ def get_stock_exchanges():
 
 
 #! -------------------------------------------
-#? Store Layout APIs
+#? Store Layout Generation API
+# app/routes.py
 
-
-@api_blueprint.route('/api/generate_store_layout', methods=['POST'])
+@api_blueprint.route('/api/generate_layout_template', methods=['GET'])
+@cross_origin()  # Allow CORS
 @swag_from({
-    'tags': ['Store Layout'],
+    'tags': ['Layout Generation'],
     'parameters': [
         {
-            'name': 'body',
-            'in': 'body',
+            'name': 'width',
+            'in': 'query',
+            'type': 'number',
             'required': True,
-            'schema': {
-                'type': 'object',
-                'properties': {
-                    'shape': {
-                        'type': 'string',
-                        'enum': ['rectangle', 'L-shape', 'custom'],
-                        'default': 'rectangle'
-                    },
-                    'width': {'type': 'integer', 'default': 5},
-                    'height': {'type': 'integer', 'default': 5},
-                    'include_butcher': {'type': 'boolean', 'default': True},
-                    'include_fruits_vegetables': {'type': 'boolean', 'default': True},
-                    'include_spices': {'type': 'boolean', 'default': True},
-                    'include_staff_room': {'type': 'boolean', 'default': True}
-                },
-                'required': ['shape', 'width', 'height']
-            }
+            'description': 'Store width in meters'
+        },
+        {
+            'name': 'height',
+            'in': 'query',
+            'type': 'number',
+            'required': True,
+            'description': 'Store height in meters'
+        },
+        {
+            'name': 'cell_size',
+            'in': 'query',
+            'type': 'number',
+            'required': True,
+            'description': 'Size of one grid cell in meters'
         }
     ],
     'responses': {
         200: {
-            'description': 'Generated store layout and special section positions',
+            'description': 'Generated layout grid',
             'examples': {
                 'application/json': {
-                    'layout': [
-                        ["Door", "Aisle", "Aisle"],
-                        ["Walkway", "Aisle", "Spices"],
-                        ["Aisle", "Cashier", "FruitsVeg"]
+                    'grid': [
+                        [{'type': 'empty', 'x': 0, 'y': 0}, {'type': 'empty', 'x': 1, 'y': 0}],
+                        [{'type': 'shelf', 'x': 0, 'y': 1}, {'type': 'shelf', 'x': 1, 'y': 1}]
                     ],
-                    'door_position': [0, 0],
-                    'cashier_positions': [[2, 0], [2, 1]],
-                    'staff_room_position': [2, 2],
-                    'butcher_position': [1, 2],
-                    'fruits_vegetables_position': [2, 2],
-                    'spices_position': [1, 2]
+                    'rows': 2,
+                    'cols': 2,
+                    'cell_size': 1
                 }
             }
         }
     }
 })
-def generate_store_layout_api():
-    data = request.get_json()
-    shape = data.get('shape', 'rectangle')
-    width = int(data.get('width', 5))
-    height = int(data.get('height', 5))
-    include_butcher = data.get('include_butcher', True)
-    include_fruits_vegetables = data.get('include_fruits_vegetables', True)
-    include_spices = data.get('include_spices', True)
-    include_staff_room = data.get('include_staff_room', True)
+def generate_layout_template_api():
+    width = float(request.args.get('width'))
+    height = float(request.args.get('height'))
+    cell_size = float(request.args.get('cell_size'))
 
-    result = generate_store_layout(
-        shape,
-        width,
-        height,
-        include_butcher=include_butcher,
-        include_fruits_vegetables=include_fruits_vegetables,
-        include_spices=include_spices,
-        include_staff_room=include_staff_room
-    )
-
-    response = {
-        'layout': result['layout'],
-        'door_position': result.get('door_position'),
-        'cashier_positions': result.get('cashier_positions'),
-        'staff_room_position': result.get('staff_room_position'),
-        'butcher_position': result.get('butcher_position'),
-        'fruits_vegetables_position': result.get('fruits_vegetables_position'),
-        'spices_position': result.get('spices_position')
-    }
-
-    return jsonify(response)
+    layout = generate_layout_template(width, height, cell_size)
+    return jsonify(layout)
 
 
-@api_blueprint.route('/api/arrange_products', methods=['POST'])
+@api_blueprint.route('/api/optimize_layout', methods=['POST'])
+@cross_origin()
 @swag_from({
-    'tags': ['Product Arrangement'],
+    'tags': ['Layout Optimization'],
+    'consumes': ['application/json'],
+    'produces': ['application/json'],
     'parameters': [
         {
             'name': 'body',
@@ -444,49 +420,53 @@ def generate_store_layout_api():
             'schema': {
                 'type': 'object',
                 'properties': {
-                    'layout': {
+                    'grid': {
                         'type': 'array',
                         'items': {
                             'type': 'array',
-                            'items': {'type': 'string'}
-                        },
-                        'example': [
-                            ["Aisle", "Aisle", "Aisle"],
-                            ["Walkway", "Walkway", "Walkway"],
-                            ["Aisle", "Aisle", "Aisle"]
-                        ]
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'type': {'type': 'string'},
+                                    'x': {'type': 'integer'},
+                                    'y': {'type': 'integer'}
+                                },
+                                'required': ['type', 'x', 'y']
+                            }
+                        }
                     }
                 },
-                'required': ['layout']
-            }
+                'required': ['grid']
+            },
+            'description': 'The layout grid to be optimized'
         }
     ],
     'responses': {
         200: {
-            'description': 'Product pairs assigned to aisle positions',
+            'description': 'Optimized layout grid',
             'examples': {
                 'application/json': {
-                    'product_arrangement': [
-                        {
-                            "product1": "Milk",
-                            "product2": "Cereal",
-                            "score": 0.89,
-                            "product1_position": [0, 0],
-                            "product2_position": [0, 1]
-                        }
+                    'grid': [
+                        [{'type': 'Door', 'x': 0, 'y': 0}, {'type': 'Cashier', 'x': 1, 'y': 0}],
+                        [{'type': 'Walkway', 'x': 0, 'y': 1}, {'type': 'Aisle', 'x': 1, 'y': 1}]
                     ]
                 }
             }
         },
-        400: {'description': 'Missing layout data'}
+        400: {
+            'description': 'Invalid input or missing grid'
+        }
     }
 })
-def arrange_products_api():
+def optimize_layout_api():
     data = request.get_json()
-    layout = data.get('layout')
+    grid = data.get('grid')
+    rows = data.get('rows')
+    cols = data.get('cols')
+    cell_size = data.get('cell_size')
 
-    if not layout:
-        return jsonify({'error': 'Missing layout data'}), 400
+    if not grid:
+        return jsonify({'error': 'Missing layout grid'}), 400
 
-    product_arrangement = arrange_products(layout)
-    return jsonify({'product_arrangement': product_arrangement})
+    optimized = optimize_layout(grid, rows, cols, cell_size)
+    return jsonify({optimized})
