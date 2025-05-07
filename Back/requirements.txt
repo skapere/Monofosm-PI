@@ -1,0 +1,16 @@
+Flask
+Flask-SQLAlchemy
+pyodbc
+flasgger
+pandas
+scikit-learn
+joblib
+xgboost
+seaborn
+matplotlib
+numpy
+networkx
+node2vec
+prophet
+requests
+dotenv
