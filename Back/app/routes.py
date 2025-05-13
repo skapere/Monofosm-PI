@@ -14,6 +14,7 @@ from flask import current_app as app
 import os
 from dotenv import load_dotenv
 from flask_cors import cross_origin
+from app.aisles_recom import recommend_category_placement
 
 load_dotenv()
 
@@ -469,4 +470,63 @@ def optimize_layout_api():
         return jsonify({'error': 'Missing layout grid'}), 400
 
     optimized = optimize_layout(grid, rows, cols, cell_size)
-    return jsonify({optimized})
+    return jsonify(optimized)
+
+
+@api_blueprint.route('/api/recommend_category_placement', methods=['POST'])
+@cross_origin()
+@swag_from({
+    'tags': ['Category Placement'],
+    'consumes': ['application/json'],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'grid': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'type': {'type': 'string'},
+                                    'x': {'type': 'integer'},
+                                    'y': {'type': 'integer'}
+                                },
+                                'required': ['type', 'x', 'y']
+                            }
+                        }
+                    },
+                    'rows': {'type': 'integer'},
+                    'cols': {'type': 'integer'},
+                    'cell_size': {'type': 'number'}
+                },
+                'required': ['grid', 'rows', 'cols', 'cell_size']
+            },
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Same grid with category names appended to Aisle types'
+        }
+    }
+})
+def recommend_category_placement_api():
+    data = request.get_json()
+
+    if not data or "grid" not in data:
+        return jsonify({'error': 'Missing grid data'}), 400
+
+    try:
+        updated_grid = recommend_category_placement(data)
+        return jsonify({'grid': updated_grid})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+

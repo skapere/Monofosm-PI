@@ -18,7 +18,7 @@ def create_app():
     mongo.init_app(app)
 
     # Enable CORS for all routes
-    CORS(app)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # Initialize Swagger
     Swagger(app)

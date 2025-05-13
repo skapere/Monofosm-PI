@@ -8,7 +8,6 @@ import {Cell} from "../demo/api/cell.model";
 import {ChatStockService} from "../demo/service/chatstock.service";
 import {supplierService} from "../demo/service/supplier.service";
 import {SalesService} from "../demo/service/sales.service";
-import {Reponse} from "../demo/api/Recipe.model";
 import {Observable} from "rxjs";
 
 @Component({
@@ -504,7 +503,7 @@ export class AppTopBarComponent {
       cell_size: this.cellSize
     };
 
-    this.salesService.generateLayoutTemplate('generate_layout_template', params).subscribe({
+    this.salesService.generateLayoutTemplate(params).subscribe({
       next: (data) => {
         this.layout = data.grid;
         this.loadingLayout = false;
@@ -518,10 +517,20 @@ export class AppTopBarComponent {
   }
 
   optimizeStoreLayout(): void {
+    // Transform layout: replace selected zone types with 'Walkway'
+    const transformedLayout = this.layout.map(row =>
+      row.map(cell => {
+        const replaceWithWalkway = ['Aisle', 'Cashier', 'Butcher', 'FruitsVeg', 'Spices'];
+        return replaceWithWalkway.includes(cell.type)
+          ? { ...cell, type: 'Walkway' }
+          : cell;
+      })
+    );
+
     const payload = {
-      grid: this.layout,
-      rows: this.layout.length,
-      cols: this.layout[0]?.length || 0,
+      grid: transformedLayout,
+      rows: transformedLayout.length,
+      cols: transformedLayout[0]?.length || 0,
       cell_size: this.cellSize
     };
 
@@ -530,7 +539,27 @@ export class AppTopBarComponent {
       'Door', 'StaffRoom', 'Butcher', 'FruitsVeg', 'Spices'
     ];
 
-    this.salesService.optimizeLayout('optimize_layout', payload).subscribe({
+    this.salesService.optimizeLayout(payload).subscribe({
+      next: (data) => {
+        this.layout = data.grid;
+      },
+      error: (error) => {
+        console.error('Error optimizing layout:', error);
+      }
+    });
+  }
+
+  productrecommendations(): void {
+    // Transform layout: replace selected zone types with 'Walkway'
+
+    const payload = {
+      grid: this.layout,
+      rows: this.layout.length,
+      cols: this.layout[0]?.length || 0,
+      cell_size: this.cellSize
+    };
+
+    this.salesService.categoryRecom(payload).subscribe({
       next: (data) => {
         this.layout = data.grid;
       },
@@ -542,11 +571,17 @@ export class AppTopBarComponent {
 
 
 
+
   getCellColor(row: number,cell: number): string {
-    switch (this.layout[row][cell].type) {
+    const cellType = this.layout[row][cell].type;
+
+    if (cellType.startsWith('Aisle')) {
+      return '#8bc34a';
+    }
+
+    switch (cellType) {
       case 'Empty': return '#e1e1e1';
       case 'Walkway': return '#f0f0f0';
-      case 'Aisle': return '#8bc34a';
       case 'Cashier': return '#03a9f4';
       case 'Door': return '#ff5722';
       case 'StaffRoom': return '#9c27b0';
@@ -558,10 +593,15 @@ export class AppTopBarComponent {
   }
 
   getCellEmogie(row: number, cell: number): string {
-    switch (this.layout[row][cell].type) {
+    const cellType = this.layout[row][cell].type;
+
+    if (cellType.startsWith('Aisle')) {
+      return cellType;
+    }
+
+    switch (cellType) {
       case 'Empty': return 'Empty';
       case 'Walkway': return 'Walkway';
-      case 'Aisle': return 'Aisle';
       case 'Cashier': return '💰 Cashiers';
       case 'Door': return '🚪 Door';
       case 'StaffRoom': return '👥 Staff Room';
