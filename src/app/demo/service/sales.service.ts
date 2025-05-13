@@ -32,51 +32,22 @@ export class SalesService {
   //Region Store Layout
 
 
-  generateLayoutTemplate(endpoint: string, params: any): Observable<any> {
-    return this.http.get(`http://localhost:5000/api/${endpoint}`, { params });
+  generateLayoutTemplate(params: any): Observable<any> {
+    return this.http.get(`http://localhost:5000/api/generate_layout_template`, { params });
   }
 
-  optimizeLayout(endpoint: string, payload: any): Observable<any> {
-    return this.http.post(`http://localhost:5000/api/${endpoint}`, payload);
+  optimizeLayout(payload: any): Observable<any> {
+    return this.http.post(`http://localhost:5000/api/optimize_layout`, payload);
+  }
+
+  categoryRecom(payload: any): Observable<any> {
+    return this.http.post(`http://localhost:5000/api/recommend_category_placement`, payload);
   }
 
 
 
   //End Store layout
 
-
-  /*
-  generateStoreLayout(
-    shape: string,
-    width: number,
-    height: number,
-    includeButcher = true,
-    includeFruitsVegetables = true,
-    includeSpices = true,
-    includeStaffRoom = true
-  ): Observable<any> {
-    const body = {
-      shape,
-      width,
-      height,
-      include_butcher: includeButcher,
-      include_fruits_vegetables: includeFruitsVegetables,
-      include_spices: includeSpices,
-      include_staff_room: includeStaffRoom
-    };
-    return this.http.post(`${this.baseUrl}/generate_store_layout`, body, {
-      headers: this.getHeaders()
-    });
-  }
-
-
-  arrangeProducts(layout: string[][]): Observable<any> {
-    const body = { layout };
-    return this.http.post(`${this.baseUrl}/arrange_products`, body, {
-      headers: this.getHeaders()
-    });
-  }
-*/
 
 
 
